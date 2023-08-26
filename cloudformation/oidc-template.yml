@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: GitHub OIDC for when GitHub wants to communicate with AWS.
+Resources:
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GitHub_Actions_Role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                ## THESE ARE CASE SENSITIVE!
+                'token.actions.githubusercontent.com:sub': ['repo:manchicken/*']
+              StringEqualsIgnoreCase:
+                'token.actions.githubusercontent.com:aud': sts.amazonaws.com
+      Policies:
+        - PolicyName: GitHub2GitHub
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: OidcSafeties
+                Effect: Deny
+                Action:
+                  - sts:AssumeRole
+                NotResource:
+                  ## THESE ARE CASE SENSITIVE!
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/GitHub*'
+              - Sid: AllowGitHub2GitHub
+                Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                Resource:
+                  ## THESE ARE CASE SENSITIVE!
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/GitHub*'
+
+  GitHubActionsOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+      Url: https://token.actions.githubusercontent.com
