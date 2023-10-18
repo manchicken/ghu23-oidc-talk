@@ -13,7 +13,9 @@ You can mitigate the security risk here with three different techniques:
    1. Use resource wildcards judiciously, and never use `Resource: *`
    2. When possible, use `NotResource` and `Condition` statements.
    3. Explicitly list all permissions, avoiding wildcards for permissions entirely.
-3. Do not use this for CDK or Terraform, as those systems require a _lot_ of permissions to run.
+3. Do not use this for CDK or Terraform, as those systems require a _lot_ of permissions to run. If you want to use GitHub to deploy infrastructure, consider using a CodePipeline which pulls from GitHub, and then deploy using a combination of CodePipeline and CodeBuild.
+
+For additional reading on how to use this securely, check out this wonderful article by Christophe Tafani-Dereeper: https://securitylabs.datadoghq.com/articles/exploring-github-to-aws-keyless-authentication-flaws/
 
 ## Deploying the OIDC template
 
