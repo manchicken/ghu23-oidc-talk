@@ -1,0 +1,19 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  get_caller_identity:
+    name: Deploy Site
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub_Actions_Role
+          aws-region: us-east-1
+      - name: Upload the site contents
+        run: |
+          aws s3 cp index.html s3://ghu2023-demo/
