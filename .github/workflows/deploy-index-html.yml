@@ -9,11 +9,15 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+            
       - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub_Actions_Role
           aws-region: us-east-1
+
       - name: Upload the site contents
         run: |
           aws s3 cp index.html s3://ghu2023-demo/
