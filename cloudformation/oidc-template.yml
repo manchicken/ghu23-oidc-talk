@@ -56,11 +56,13 @@ Resources:
               Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
             Action: sts:AssumeRoleWithWebIdentity
             Condition:
-              # StringLike:
-                ## THESE ARE CASE SENSITIVE!
-                # 'token.actions.githubusercontent.com:sub': ['repo:manchicken/*']
+              ## External ID
+              StringEquals:
+                'sts:ExternalId': '{{resolve:ssm:github-external-id:1}}'
+              ## All of these conditions are case-sensitive.
               StringLike:
-                'token.actions.githubusercontent.com:repository_owner': ['manchicken']
+                ## This is intentional, we want to use repository_owner instead of sub!
+                'token.actions.githubusercontent.com:sub': ['repo:manchicken/*']
               StringEqualsIgnoreCase:
                 'token.actions.githubusercontent.com:aud': sts.amazonaws.com
       Policies:
